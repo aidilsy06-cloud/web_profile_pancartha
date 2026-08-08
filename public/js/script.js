@@ -1,177 +1,186 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Navbar scroll background & Active Section Link
-    const navbar = document.querySelector('.navbar');
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-link');
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navMenu = document.querySelector('.nav-menu');
+/* ═══════════════════════════════════════
+   PANCA ARTHA — MAIN JAVASCRIPT
+   ═══════════════════════════════════════ */
 
-    // Mobile Menu Toggle
+'use strict';
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    /* ─── NAVBAR SCROLL EFFECT ─── */
+    const navWrapper = document.querySelector('.nav-wrapper');
+    if (navWrapper) {
+        const handleScroll = () => {
+            navWrapper.classList.toggle('scrolled', window.scrollY > 40);
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
+    }
+
+    /* ─── MOBILE MENU TOGGLE ─── */
+    const menuToggle = document.getElementById('menu-toggle');
+    const navMenu    = document.getElementById('nav-menu');
     if (menuToggle && navMenu) {
         menuToggle.addEventListener('click', () => {
             navMenu.classList.toggle('open');
+            menuToggle.classList.toggle('open');
             const isOpen = navMenu.classList.contains('open');
-            menuToggle.innerHTML = isOpen ? '&#10005;' : '&#9776;'; // X or Hamburger
+            menuToggle.setAttribute('aria-expanded', isOpen);
         });
-    }
-
-    // Close menu when clicking nav link
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            if (navMenu) navMenu.classList.remove('open');
-            if (menuToggle) menuToggle.innerHTML = '&#9776;';
-        });
-    });
-
-    // Window scroll functions
-    window.addEventListener('scroll', () => {
-        const scrollY = window.pageYOffset;
-
-        // Navbar blur on scroll
-        if (scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-
-        // Active link highlighting
-        sections.forEach(current => {
-            const sectionHeight = current.offsetHeight;
-            const sectionTop = current.offsetTop - 120;
-            const sectionId = current.getAttribute('id');
-            
-            if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                document.querySelector('.nav-link[href*=' + sectionId + ']').classList.add('active');
-            } else {
-                const navItem = document.querySelector('.nav-link[href*=' + sectionId + ']');
-                if (navItem) navItem.classList.remove('active');
-            }
-        });
-    });
-
-    // 2. Stats Counter Animation
-    const statsSection = document.querySelector('.stats');
-    const statNums = document.querySelectorAll('.stat-num[data-target]');
-    let started = false;
-
-    const startCount = (el) => {
-        const target = parseInt(el.getAttribute('data-target'), 10);
-        const suffix = el.getAttribute('data-suffix') || '';
-        let count = 0;
-        const speed = target / 50; // speed factor
-
-        const updateCount = () => {
-            count += speed;
-            if (count < target) {
-                el.innerText = Math.floor(count) + suffix;
-                setTimeout(updateCount, 25);
-            } else {
-                el.innerText = target + suffix;
-            }
-        };
-        updateCount();
-    };
-
-    if (statsSection && statNums.length > 0) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !started) {
-                    statNums.forEach(num => startCount(num));
-                    started = true;
-                }
+        // Close menu when link clicked
+        navMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('open');
+                menuToggle.classList.remove('open');
             });
-        }, { threshold: 0.5 });
-        
-        observer.observe(statsSection);
+        });
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!navWrapper.contains(e.target)) {
+                navMenu.classList.remove('open');
+                menuToggle.classList.remove('open');
+            }
+        });
     }
 
-    // 3. Interactive Services Selection
-    const serviceTabs = document.querySelectorAll('.service-tab');
-    const displayTitle = document.querySelector('.services-display-title');
-    const displayDesc = document.querySelector('.services-display-desc');
-    const displayImg = document.querySelector('.services-display-img img');
-    
-    // Custom descriptions and assets for services (Indonesian translation)
-    const servicesData = {
-        'web-dev': {
-            title: 'Pengembangan Web Aman',
-            desc: 'Kami merancang situs web dan portal web mutakhir dengan fokus kuat pada ketangguhan kode, pengiriman berkecepatan tinggi, dan kesempurnaan estetika. Portofolio utama kami adalah website resmi Lembaga Adat Melayu Riau (LAMR) Kabupaten Bengkalis.',
-            img: 'assets/lamr-mockup.png'
-        },
-        'uiux': {
-            title: 'Desain UI/UX & Interaktif',
-            desc: 'Kami memetakan pengalaman pengguna (user journey) dan merancang antarmuka yang memukau dengan tipografi kelas atas, efek glassmorphism, sistem warna HSL yang disesuaikan, serta panduan gaya modern untuk memaksimalkan interaksi pengguna.',
-            img: 'assets/cta-character.png'
-        },
-        'network': {
-            title: 'Pengerasan Jaringan & Basis Data',
-            desc: 'Kami menerapkan jaringan server yang aman, mengonfigurasi basis data terenkripsi, menerapkan perlindungan terhadap SQL injection, dan mengelola lingkungan server Linux dengan pertahanan aktif untuk menjamin waktu aktif tanpa gangguan.',
-            img: 'assets/hero-cyber.png'
-        }
+    /* ─── ACTIVE NAV LINK (scroll spy) ─── */
+    const sections  = document.querySelectorAll('section[id]');
+    const navLinks  = document.querySelectorAll('.nav-link');
+    const observer  = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    sections.forEach(s => observer.observe(s));
+
+    /* ─── ANIMATED STAT COUNTER ─── */
+    const statNumbers = document.querySelectorAll('.stat-number[data-target]');
+    const easeOutQuart = t => 1 - Math.pow(1 - t, 4);
+
+    const animateCounter = (el) => {
+        const target  = parseInt(el.dataset.target, 10);
+        const suffix  = el.dataset.suffix || '';
+        const duration = 2000;
+        const start   = performance.now();
+
+        const tick = (now) => {
+            const elapsed  = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased    = easeOutQuart(progress);
+            el.textContent = Math.round(eased * target) + suffix;
+            if (progress < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
     };
 
-    serviceTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            // Remove active classes
-            serviceTabs.forEach(t => t.classList.remove('active'));
-            
-            // Add active class to clicked tab
-            tab.classList.add('active');
-            
-            // Update display content with fade effect
-            const serviceKey = tab.getAttribute('data-service');
-            const data = servicesData[serviceKey];
-            
-            if (data && displayTitle && displayDesc && displayImg) {
-                // Fade out animation
-                const displayArea = document.querySelector('.services-display');
-                displayArea.style.opacity = '0.3';
-                displayArea.style.transform = 'translateY(10px)';
-                displayArea.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-                
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounter(entry.target);
+                counterObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+    statNumbers.forEach(el => counterObserver.observe(el));
+
+    /* ─── SCROLL REVEAL ─── */
+    const revealItems = document.querySelectorAll(
+        '.service-card, .portfolio-card, .team-card, .testimonial-card, ' +
+        '.stat-item, .feature-item, .contact-item'
+    );
+    revealItems.forEach(el => el.classList.add('reveal'));
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                const delay = entry.target.dataset.revealDelay || 0;
                 setTimeout(() => {
-                    displayTitle.textContent = data.title;
-                    displayDesc.textContent = data.desc;
-                    displayImg.src = data.img;
-                    
-                    // Fade back in
-                    displayArea.style.opacity = '1';
-                    displayArea.style.transform = 'translateY(0)';
-                }, 200);
+                    entry.target.classList.add('visible');
+                }, delay);
+                revealObserver.unobserve(entry.target);
             }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+    // Stagger children within grids
+    document.querySelectorAll('.services-grid, .team-grid, .portfolio-grid, .testimonials-grid, .stats-grid').forEach(grid => {
+        [...grid.children].forEach((child, i) => {
+            child.dataset.revealDelay = i * 80;
         });
     });
 
-    // 4. Smooth Scrolling for Links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            
-            if (targetElement) {
-                const headerHeight = 100; // offsets fixed header
-                const elementPosition = targetElement.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
-                
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
+    revealItems.forEach(el => revealObserver.observe(el));
 
-    // 5. Consulting Form Submission (Indonesian alert)
-    const contactForm = document.querySelector('.cta-form');
-    if (contactForm) {
+    /* ─── CONTACT FORM (demo) ─── */
+    const contactForm = document.getElementById('contact-form');
+    const cfSuccess   = document.getElementById('cf-success');
+    if (contactForm && cfSuccess) {
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const emailInput = contactForm.querySelector('.cta-input');
-            if (emailInput && emailInput.value.trim() !== '') {
-                alert(`Terima kasih! Panca Artha akan segera menghubungi Anda di: ${emailInput.value}`);
-                emailInput.value = '';
-            }
+            const btn = contactForm.querySelector('.cf-submit');
+            btn.textContent = 'Mengirim...';
+            btn.disabled = true;
+            setTimeout(() => {
+                cfSuccess.style.display = 'block';
+                contactForm.reset();
+                btn.innerHTML = 'Kirim Pesan <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+                btn.disabled = false;
+                setTimeout(() => { cfSuccess.style.display = 'none'; }, 5000);
+            }, 1200);
         });
     }
+
+    /* ─── MENU TOGGLE ANIMATION ─── */
+    if (menuToggle && navMenu) {
+        const spans = menuToggle.querySelectorAll('span');
+        const updateIcon = () => {
+            const isOpen = navMenu.classList.contains('open');
+            if (isOpen) {
+                spans[0].style.cssText = 'transform: rotate(45deg) translate(5px, 5px)';
+                spans[1].style.cssText = 'opacity: 0; transform: scaleX(0)';
+                spans[2].style.cssText = 'transform: rotate(-45deg) translate(5px, -5px)';
+            } else {
+                spans.forEach(s => s.style.cssText = '');
+            }
+        };
+        menuToggle.addEventListener('click', updateIcon);
+        navMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', updateIcon));
+    }
+
+    /* ─── TEAM CARDS — MOBILE TAP TOGGLE ─── */
+    const isTouchDevice = () => window.matchMedia('(max-width: 768px)').matches;
+
+    const teamCards = document.querySelectorAll('.t-card');
+
+    teamCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            // Only apply tap logic on mobile/touch breakpoint
+            if (!isTouchDevice()) return;
+
+            // Allow links (social icons) inside to work normally
+            if (e.target.closest('a')) return;
+
+            const isOpen = card.classList.contains('is-active');
+
+            // Close all other cards
+            teamCards.forEach(c => c.classList.remove('is-active'));
+
+            // Toggle this card
+            if (!isOpen) {
+                card.classList.add('is-active');
+            }
+        });
+    });
+
+    // Close active cards when tapping outside
+    document.addEventListener('click', (e) => {
+        if (!isTouchDevice()) return;
+        if (!e.target.closest('.t-card')) {
+            teamCards.forEach(c => c.classList.remove('is-active'));
+        }
+    });
+
 });
