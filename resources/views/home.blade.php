@@ -7,8 +7,8 @@
 
     {{-- ═══════════════ HERO ═══════════════ --}}
     <section class="hero" id="home">
-        <!-- RippleGrid WebGL Background (fixed) -->
-        <div id="ripple-grid-bg"></div>
+        <!-- GradientWaves WebGL Background (fixed) -->
+        <div id="gradient-waves-bg" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: -1; pointer-events: none;"></div>
 
         <div class="container hero-inner hero-stacked">
             <!-- Top: Animated Laptop (logo inside screen) -->
@@ -195,23 +195,6 @@
                     ">
                         <div class="pf-top-overlay"></div>
                         <div class="pf-tab"></div>
-                        <div class="pf-icons-row">
-                            <div class="pf-logo-wrap">
-                                <img src="{{ asset('logo-panca-artha.svg') }}" alt="Panca Artha" class="pf-logo-svg">
-                            </div>
-                            <div class="pf-action-links">
-                                @if($project->demo_url)
-                                <a href="{{ $project->demo_url }}" target="_blank" rel="noopener" class="pf-icon-btn" title="Demo Live">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                                </a>
-                                @endif
-                                @if($project->repo_url)
-                                <a href="{{ $project->repo_url }}" target="_blank" rel="noopener" class="pf-icon-btn" title="Repository">
-                                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-                                </a>
-                                @endif
-                            </div>
-                        </div>
                     </div>
 
                     {{-- ── BOTTOM SECTION (info) ── --}}
@@ -222,20 +205,19 @@
                                 <span class="pf-tech">{{ $tech }}</span>
                             @endforeach
                         </div>
-                        <div class="pf-stats">
-                            <div class="pf-stat">
-                                <span class="pf-stat-label">Masalah</span>
-                                <p class="pf-stat-text">{{ Str::limit($project->problem, 60) }}</p>
-                            </div>
-                            <div class="pf-stat pf-stat--mid">
-                                <span class="pf-stat-label">Solusi</span>
-                                <p class="pf-stat-text">{{ Str::limit($project->solution, 60) }}</p>
-                            </div>
-                            <div class="pf-stat">
-                                <span class="pf-stat-label">Hasil</span>
-                                <p class="pf-stat-text">{{ Str::limit($project->result, 60) }}</p>
-                            </div>
-                        </div>
+                        
+                        <button class="pf-detail-btn" 
+                            data-title="{{ $project->name }}"
+                            data-image="{{ $project->image ? asset('storage/'.$project->image) : '' }}"
+                            data-tech="{{ json_encode($project->tech_array) }}"
+                            data-problem="{{ $project->problem }}"
+                            data-solution="{{ $project->solution }}"
+                            data-result="{{ $project->result }}"
+                            data-demo="{{ $project->demo_url }}"
+                            data-repo="{{ $project->repo_url }}"
+                        >
+                            Lihat Detail
+                        </button>
                     </div>
                 </div>
                 @empty
@@ -359,29 +341,37 @@
             <span class="section-label">Stack Kami</span>
             <h2 class="section-title" style="margin-top: 8px;">Tools & <span>Teknologi</span></h2>
         </div>
-        <div class="ticker-outer">
-            <div class="ticker-inner">
-                @foreach($technologies as $tech)
-                <div class="ticker-item">
-                    @if($tech->logo)
-                        <img src="{{ $tech->logo_url }}" alt="{{ $tech->name }}" class="ticker-logo">
-                    @else
-                        <span class="ticker-dot">✦</span>
-                    @endif
-                    {{ $tech->name }}
+        <div class="terminal-card">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <span class="t-btn t-btn-red"></span>
+                    <span class="t-btn t-btn-yellow"></span>
+                    <span class="t-btn t-btn-green"></span>
                 </div>
-                @endforeach
-                {{-- Duplicate for seamless loop --}}
-                @foreach($technologies as $tech)
-                <div class="ticker-item">
-                    @if($tech->logo)
-                        <img src="{{ $tech->logo_url }}" alt="{{ $tech->name }}" class="ticker-logo">
-                    @else
-                        <span class="ticker-dot">✦</span>
-                    @endif
-                    {{ $tech->name }}
+                <p class="terminal-title">root@panca-artha: ~</p>
+            </div>
+            <div class="terminal-body">
+                <p class="terminal-prompt">
+                    <span class="prompt-user">root@panca-artha:~$</span> ls /tools
+                </p>
+                <div class="terminal-grid">
+                    @foreach($technologies as $tech)
+                        <p>
+                            @if($tech->logo)
+                                <img src="{{ $tech->logo_url }}" alt="{{ $tech->name }}" style="width:16px;height:16px;object-fit:contain;">
+                            @else
+                                <span style="color:#facc15">✦</span>
+                            @endif
+                            {{ $tech->name }}
+                        </p>
+                    @endforeach
                 </div>
-                @endforeach
+            </div>
+            <div class="terminal-footer">
+                <p class="terminal-prompt" style="margin:0;">
+                    <span class="prompt-user">root@panca-artha:~$</span>
+                </p>
+                <span class="terminal-cursor"></span>
             </div>
         </div>
     </section>
@@ -511,15 +501,54 @@
         </div>
     </section>
 
+    {{-- ═══════════════ PORTFOLIO MODAL ═══════════════ --}}
+    <div id="pf-modal" class="pf-modal-overlay">
+        <div class="pf-modal-content">
+            <button id="pf-modal-close" class="pf-modal-close" aria-label="Close modal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <div class="pf-modal-header" id="pf-modal-header">
+                {{-- Background image set via JS --}}
+                <div class="pf-modal-header-overlay"></div>
+                <h3 id="pf-modal-title" class="pf-modal-title">TITLE</h3>
+                <div id="pf-modal-tags" class="pf-modal-tags"></div>
+            </div>
+            <div class="pf-modal-body">
+                <div class="pf-modal-section">
+                    <h4>Masalah</h4>
+                    <p id="pf-modal-problem"></p>
+                </div>
+                <div class="pf-modal-section">
+                    <h4>Solusi</h4>
+                    <p id="pf-modal-solution"></p>
+                </div>
+                <div class="pf-modal-section">
+                    <h4>Hasil</h4>
+                    <p id="pf-modal-result"></p>
+                </div>
+            </div>
+            <div class="pf-modal-footer">
+                <a href="#" id="pf-modal-demo" target="_blank" rel="noopener" class="pf-btn pf-btn-demo" style="display:none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Live Demo
+                </a>
+                <a href="#" id="pf-modal-repo" target="_blank" rel="noopener" class="pf-btn pf-btn-repo" style="display:none;">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                    Repository
+                </a>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
-    <!-- OGL for RippleGrid WebGL -->
+    <!-- OGL for GradientWaves WebGL -->
     <script type="module">
         import { Renderer, Program, Triangle, Mesh } from 'https://cdn.jsdelivr.net/npm/ogl@1.0.8/src/index.js';
 
-        (function initRippleGrid() {
-            const container = document.getElementById('ripple-grid-bg');
+        (function initGradientWaves() {
+            const container = document.getElementById('gradient-waves-bg');
             if (!container) return;
 
             const hexToRgb = hex => {
@@ -527,113 +556,300 @@
                 return r ? [parseInt(r[1],16)/255, parseInt(r[2],16)/255, parseInt(r[3],16)/255] : [1,1,1];
             };
 
-            const renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, 2), alpha: true });
+            const renderer = new Renderer({
+                webgl: 2,
+                alpha: true,
+                premultipliedAlpha: true,
+                antialias: false,
+                dpr: Math.min(window.devicePixelRatio || 1, 2)
+            });
+
             const gl = renderer.gl;
-            gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-            gl.canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+            gl.clearColor(0, 0, 0, 0);
+            gl.canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;';
             container.appendChild(gl.canvas);
 
-            const vert = `attribute vec2 position;
-varying vec2 vUv;
-void main() { vUv = position * 0.5 + 0.5; gl_Position = vec4(position, 0.0, 1.0); }`;
-
-            const frag = `precision highp float;
-uniform float iTime;
-uniform vec2 iResolution;
-uniform vec3 gridColor;
-uniform float rippleIntensity;
-uniform float gridSize;
-uniform float gridThickness;
-uniform float fadeDistance;
-uniform float vignetteStrength;
-uniform float glowIntensity;
-uniform float opacity;
-uniform vec2 mousePosition;
-uniform float mouseInfluence;
-uniform float mouseInteractionRadius;
-varying vec2 vUv;
-float pi = 3.141592;
+            const vert = `#version 300 es
+in vec2 position;
 void main() {
-    vec2 uv = vUv * 2.0 - 1.0;
-    uv.x *= iResolution.x / iResolution.y;
-    float dist = length(uv);
-    float func = sin(pi * (iTime - dist));
-    vec2 rippleUv = uv + uv * func * rippleIntensity;
-    vec2 mouseUv = (mousePosition * 2.0 - 1.0);
-    mouseUv.x *= iResolution.x / iResolution.y;
-    float mouseDist = length(uv - mouseUv);
-    float influence = mouseInfluence * exp(-mouseDist * mouseDist / (mouseInteractionRadius * mouseInteractionRadius));
-    float mouseWave = sin(pi * (iTime * 2.0 - mouseDist * 3.0)) * influence;
-    rippleUv += normalize(uv - mouseUv + vec2(0.001)) * mouseWave * rippleIntensity * 0.3;
-    vec2 a = sin(gridSize * 0.5 * pi * rippleUv - pi / 2.0);
-    vec2 b = abs(a);
-    float aaWidth = 0.5;
-    vec2 smoothB = vec2(smoothstep(0.0, aaWidth, b.x), smoothstep(0.0, aaWidth, b.y));
-    vec3 color = vec3(0.0);
-    color += exp(-gridThickness * smoothB.x * (0.8 + 0.5 * sin(pi * iTime)));
-    color += exp(-gridThickness * smoothB.y);
-    color += 0.5 * exp(-(gridThickness / 4.0) * sin(smoothB.x));
-    color += 0.5 * exp(-(gridThickness / 3.0) * smoothB.y);
-    color += glowIntensity * exp(-gridThickness * 0.5 * smoothB.x);
-    color += glowIntensity * exp(-gridThickness * 0.5 * smoothB.y);
-    float ddd = exp(-2.0 * clamp(pow(dist, fadeDistance), 0.0, 1.0));
-    vec2 vc = vUv - 0.5;
-    float vignette = clamp(1.0 - pow(length(vc) * 2.0, vignetteStrength), 0.0, 1.0);
-    float finalFade = ddd * vignette;
-    float alpha = length(color) * finalFade * opacity;
-    gl_FragColor = vec4(color * gridColor * finalFade * opacity, alpha);
-}`;
+  gl_Position = vec4(position, 0.0, 1.0);
+}
+`;
+
+            const frag = `#version 300 es
+precision highp float;
+uniform vec2 iResolution;
+uniform float iTime;
+uniform float uSpeed;
+uniform float uAmplitude;
+uniform float uWaveScale;
+uniform float uWaveRatio;
+uniform float uSwell;
+uniform float uTurbulence;
+uniform float uTilt;
+uniform float uZoom;
+uniform float uHeight;
+uniform float uFogDepth;
+uniform float uSteps;
+uniform float uBrightness;
+uniform float uOpacity;
+uniform float uGrain;
+uniform float uGrainIntensity;
+uniform vec2 uMouse;
+uniform float uParallax;
+uniform bool uEnableMouse;
+uniform vec3 uHorizonColor;
+uniform vec3 uWaveColor;
+uniform vec3 uCrestColor;
+out vec4 fragColor;
+
+const float MAX_DIST = 20000.0;
+
+float hash21(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+
+float plasma(vec3 r, vec2 freq, vec4 tc) {
+  float mx = r.x + tc.x;
+  mx += uSwell * sin((r.y + mx) / 20.0 + tc.y);
+  float my = r.y - tc.z;
+  my += uTurbulence * cos(r.x / 23.0 + tc.w);
+  return r.z - (sin(mx * freq.x) * uAmplitude + sin(my * freq.y) * uAmplitude + uHeight);
+}
+
+float raymarch(vec3 pos, vec3 dir, vec2 freq, vec4 tc) {
+  float dist = 0.0;
+  for (int i = 0; i < 128; i++) {
+    if (float(i) >= uSteps) break;
+    float dscene = plasma(pos + dist * dir, freq, tc);
+    if (abs(dscene) < 0.1) break;
+    dist += 0.9 * dscene;
+    if (!(abs(dist) < MAX_DIST)) return MAX_DIST;
+  }
+  return dist;
+}
+
+void main() {
+  float T = iTime * uSpeed;
+  vec2 freq = vec2(uWaveScale / 7.0, (uWaveScale * uWaveRatio) / 3.0);
+  vec4 tc = vec4(T / 0.130, T / 0.810, T / 0.200, T / 0.710);
+  float c, s;
+  float vfov = (3.14159 / 2.3) / max(uZoom, 0.05);
+  vec3 cam = vec3(0.0, 0.0, 30.0);
+  vec2 uv = (gl_FragCoord.xy / iResolution.xy) - 0.5;
+  uv.x *= iResolution.x / iResolution.y;
+  uv.y *= -1.0;
+
+  vec3 dir = vec3(0.0, 0.0, -1.0);
+  float ulen = length(uv);
+  float xrot = vfov * ulen;
+  c = cos(xrot); s = sin(xrot);
+  dir = mat3(1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c) * dir;
+  vec2 nuv = ulen > 1e-5 ? uv / ulen : vec2(1.0, 0.0);
+  c = nuv.x; s = nuv.y;
+  dir = mat3(c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0) * dir;
+  c = cos(uTilt); s = sin(uTilt);
+  dir = mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c) * dir;
+
+  if (uEnableMouse) {
+    float yaw = (uMouse.x - 0.5) * uParallax * 0.4;
+    float pitch = (uMouse.y - 0.5) * uParallax * 0.4;
+    c = cos(yaw); s = sin(yaw);
+    dir = mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c) * dir;
+    c = cos(pitch); s = sin(pitch);
+    dir = mat3(1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c) * dir;
+  }
+
+  float dist = raymarch(cam, dir, freq, tc);
+  vec3 pos = cam + dist * dir;
+
+  float t = clamp(uFogDepth / max(dist, 0.001), 0.0, 1.0);
+  vec3 body = mix(uWaveColor, uCrestColor, clamp(pos.z * 0.08 + 0.5, 0.0, 1.0));
+  vec3 col = mix(uHorizonColor, body, t);
+  col *= uBrightness;
+  col = clamp(col, 0.0, 1.0);
+
+  float alpha = clamp(t, 0.0, 1.0) * uOpacity;
+  if (uGrain > 0.5) {
+    float g = hash21(gl_FragCoord.xy + mod(iTime, 64.0) * 11.0);
+    alpha += (g - 0.5) * uGrainIntensity;
+  }
+  alpha = clamp(alpha, 0.0, 1.0);
+  fragColor = vec4(col * alpha, alpha);
+}
+`;
 
             const uniforms = {
                 iTime: { value: 0 },
-                iResolution: { value: [1, 1] },
-                gridColor: { value: hexToRgb('#3E6DA8') },
-                rippleIntensity: { value: 0.05 },
-                gridSize: { value: 10.0 },
-                gridThickness: { value: 15.0 },
-                fadeDistance: { value: 1.5 },
-                vignetteStrength: { value: 2.0 },
-                glowIntensity: { value: 0.1 },
-                opacity: { value: 1.0 },
-                mousePosition: { value: [0.5, 0.5] },
-                mouseInfluence: { value: 0 },
-                mouseInteractionRadius: { value: 0.8 }
+                iResolution: { value: new Float32Array([1, 1]) },
+                uSpeed: { value: 0.4 },
+                uAmplitude: { value: 2.5 },
+                uWaveScale: { value: 0.6 },
+                uWaveRatio: { value: 0.9 },
+                uSwell: { value: 35.0 },
+                uTurbulence: { value: 20.0 },
+                uTilt: { value: 1.11 },
+                uZoom: { value: 1.0 },
+                uHeight: { value: 5.5 },
+                uFogDepth: { value: 15.0 },
+                uSteps: { value: 70.0 },
+                uBrightness: { value: 1.0 },
+                uOpacity: { value: 1.0 },
+                uGrain: { value: 1.0 },
+                uGrainIntensity: { value: 0.05 },
+                uMouse: { value: new Float32Array([0.5, 0.5]) },
+                uParallax: { value: 0.5 },
+                uEnableMouse: { value: true },
+                uHorizonColor: { value: new Float32Array(hexToRgb('#5227FF')) },
+                uWaveColor: { value: new Float32Array(hexToRgb('#FF9FFC')) },
+                uCrestColor: { value: new Float32Array(hexToRgb('#FFFFFF')) }
             };
 
             const geometry = new Triangle(gl);
             const program = new Program(gl, { vertex: vert, fragment: frag, uniforms });
             const mesh = new Mesh(gl, { geometry, program });
 
-            const targetMouse = { x: 0.5, y: 0.5 };
-            const currentMouse = { x: 0.5, y: 0.5 };
-            let targetInfluence = 0, rafId;
-
-            const resize = () => {
-                const { clientWidth: w, clientHeight: h } = container;
+            const setSize = () => {
+                const rect = container.getBoundingClientRect();
+                const w = Math.max(1, Math.floor(rect.width));
+                const h = Math.max(1, Math.floor(rect.height));
                 renderer.setSize(w, h);
-                uniforms.iResolution.value = [w, h];
+                program.uniforms.iResolution.value[0] = gl.drawingBufferWidth;
+                program.uniforms.iResolution.value[1] = gl.drawingBufferHeight;
             };
 
-            window.addEventListener('mousemove', e => {
-                targetMouse.x = e.clientX / window.innerWidth;
-                targetMouse.y = 1.0 - (e.clientY / window.innerHeight);
-                targetInfluence = 1.0;
-            });
-            window.addEventListener('mouseleave', () => { targetInfluence = 0; });
-            window.addEventListener('resize', resize);
-            resize();
+            window.addEventListener('resize', setSize);
+            setSize();
 
+            const currentMouse = [0.5, 0.5];
+            const targetMouse = [0.5, 0.5];
+
+            const onPointerMove = e => {
+                targetMouse[0] = e.clientX / window.innerWidth;
+                targetMouse[1] = 1.0 - (e.clientY / window.innerHeight);
+            };
+            const onPointerLeave = () => {
+                targetMouse[0] = 0.5;
+                targetMouse[1] = 0.5;
+            };
+            
+            window.addEventListener('pointermove', onPointerMove);
+            window.addEventListener('pointerleave', onPointerLeave);
+
+            const t0 = performance.now();
             const render = t => {
-                rafId = requestAnimationFrame(render);
-                uniforms.iTime.value = t * 0.001;
-                currentMouse.x += (targetMouse.x - currentMouse.x) * 0.1;
-                currentMouse.y += (targetMouse.y - currentMouse.y) * 0.1;
-                uniforms.mouseInfluence.value += (targetInfluence - uniforms.mouseInfluence.value) * 0.05;
-                uniforms.mousePosition.value = [currentMouse.x, currentMouse.y];
+                requestAnimationFrame(render);
+                program.uniforms.iTime.value = (t - t0) * 0.001;
+                
+                const tx = uniforms.uEnableMouse.value ? targetMouse[0] : 0.5;
+                const ty = uniforms.uEnableMouse.value ? targetMouse[1] : 0.5;
+                
+                currentMouse[0] += 0.05 * (tx - currentMouse[0]);
+                currentMouse[1] += 0.05 * (ty - currentMouse[1]);
+                
+                program.uniforms.uMouse.value[0] = currentMouse[0];
+                program.uniforms.uMouse.value[1] = currentMouse[1];
+                
                 renderer.render({ scene: mesh });
             };
             requestAnimationFrame(render);
         })();
     </script>
 
+    <!-- Portfolio Modal Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('pf-modal');
+            const closeBtn = document.getElementById('pf-modal-close');
+            const detailBtns = document.querySelectorAll('.pf-detail-btn');
+
+            if(!modal) return;
+
+            // Open modal
+            detailBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const title = this.getAttribute('data-title');
+                    const image = this.getAttribute('data-image');
+                    const techRaw = this.getAttribute('data-tech');
+                    const problem = this.getAttribute('data-problem');
+                    const solution = this.getAttribute('data-solution');
+                    const result = this.getAttribute('data-result');
+                    const demo = this.getAttribute('data-demo');
+                    const repo = this.getAttribute('data-repo');
+
+                    // Set header background
+                    const headerOverlay = document.querySelector('.pf-modal-header-overlay');
+                    if (image) {
+                        headerOverlay.style.backgroundImage = `url('${image}')`;
+                    } else {
+                        headerOverlay.style.background = 'linear-gradient(135deg, #0d2137 0%, #0a3d62 100%)';
+                    }
+
+                    // Set texts
+                    document.getElementById('pf-modal-title').textContent = title.toUpperCase();
+                    document.getElementById('pf-modal-problem').textContent = problem;
+                    document.getElementById('pf-modal-solution').textContent = solution;
+                    document.getElementById('pf-modal-result').textContent = result;
+
+                    // Set tags
+                    const tagsContainer = document.getElementById('pf-modal-tags');
+                    tagsContainer.innerHTML = '';
+                    if (techRaw) {
+                        try {
+                            const tags = JSON.parse(techRaw);
+                            tags.forEach(tag => {
+                                const span = document.createElement('span');
+                                span.className = 'pf-tech';
+                                span.textContent = tag;
+                                tagsContainer.appendChild(span);
+                            });
+                        } catch(e) {}
+                    }
+
+                    // Set links
+                    const demoBtn = document.getElementById('pf-modal-demo');
+                    if (demo) {
+                        demoBtn.href = demo;
+                        demoBtn.style.display = 'inline-flex';
+                    } else {
+                        demoBtn.style.display = 'none';
+                    }
+
+                    const repoBtn = document.getElementById('pf-modal-repo');
+                    if (repo) {
+                        repoBtn.href = repo;
+                        repoBtn.style.display = 'inline-flex';
+                    } else {
+                        repoBtn.style.display = 'none';
+                    }
+
+                    // Show modal and prevent body scroll
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            // Close modal functions
+            const closeModal = () => {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            };
+
+            closeBtn.addEventListener('click', closeModal);
+
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+@endpush
